@@ -16,9 +16,9 @@ func main() {
 	// Set up and parse options
 	usage := `Start gotmpl HTTP server.
 Usage:
-  gotmpl-server
-  gotmpl-server [--port <port> --path <path>]
-  gotmpl-server --help | --version
+  gotmplserver
+  gotmplserver [--port <port> --path <path>]
+  gotmplserver --help | --version
 
 Options:
   -h --help         Show this screen.

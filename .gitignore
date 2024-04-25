@@ -21,5 +21,4 @@
 go.work
 
 # Binaries from this repository
-/gotmpl
-/gotmpl-server
+/bin
