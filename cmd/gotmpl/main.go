@@ -16,8 +16,7 @@ func main() {
 	usage := `Render a Go text template using the given data file.
 Usage:
   gotmpl (--template <path> --data <path>)
-  gotmpl --help
-  gotmpl --version
+  gotmpl --help | --version
 
 Options:
   -h --help             Show this screen.

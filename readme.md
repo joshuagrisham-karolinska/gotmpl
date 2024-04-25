@@ -18,6 +18,9 @@ go run cmd/gotmpl/main.go -t test.tmpl -d test.json
 
 # Test with invalid data
 go run cmd/gotmpl/main.go -t test.tmpl -d test-bad.json
+
+# Build with a specific version
+go build -ldflags "-X github.com/joshuagrisham-karolinska/gotmpl.Version=v0.0.1-alpha.0" ./cmd/gotmpl
 ```
 
 ## Server
