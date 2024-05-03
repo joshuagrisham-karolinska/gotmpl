@@ -56,3 +56,27 @@ export GOARCH=amd64
 go build -o "bin/gotmpl_${GOOS}_${GOARCH}" -ldflags "-X ${GOTMPL_PKG}.Version=${GOTMPL_VERSION}" ./cmd/gotmpl
 go build -o "bin/gotmplserver_${GOOS}_${GOARCH}" -ldflags "-X ${GOTMPL_PKG}.Version=${GOTMPL_VERSION}" ./cmd/gotmplserver
 ```
+
+## Build and run a GUI using WebAssembly
+
+```sh
+# Build the WebAssembly
+GOOS=js GOARCH=wasm go build -o wasm/template.wasm ./wasm/main.go
+# Copy Go's standard wasm_exec.js
+cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" wasm/
+```
+
+And run a simple web server to host an example of it:
+
+```sh
+# install goexec: go install github.com/shurcooL/goexec
+# goexec 'http.ListenAndServe(`:8080`, http.FileServer(http.Dir(`.`)))'
+
+# Run a tiny container using docker instead
+docker run --name staticwebsite --rm -p 3000:3000 -v ${PWD}/wasm/:/home/static/:ro lipanski/docker-static-website:latest
+
+# Then go to: http://localhost:3000
+
+# Kill the staticwebsite container once you are finished
+docker kill staticwebsite
+```
