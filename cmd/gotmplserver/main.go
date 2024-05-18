@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -47,6 +48,15 @@ func handlePath(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// If text/template execution fails it will panic
+	// In this case we will capture the panic and return an error with reason TemplateError
+	defer func() {
+		if err := recover(); err != nil {
+			writeHttpBadRequest(w, "TemplateError", fmt.Sprintf("%v", err))
+			return
+		}
+	}()
+
 	// Get template and data from form values
 	// Note: per https://pkg.go.dev/net/http#Request.FormValue
 	//  using FormValue supports the client to set these values in any of:
@@ -61,15 +71,32 @@ func handlePath(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	err := json.Unmarshal([]byte(dataString), &data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeHttpBadRequest(w, "DataUnmarshallingError", err.Error())
 		return
 	}
 
 	// Render template using data and write the result to the ResponseWriter
 	err = template.Render(tmpl, data, w)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeHttpBadRequest(w, "TemplateRenderingError", err.Error())
 		return
 	}
 
+}
+
+type HttpError struct {
+	Reason  string `json:"reason"`
+	Message string `json:"message"`
+}
+
+type HttpErrorResponse struct {
+	Error HttpError `json:"error"`
+}
+
+func writeHttpBadRequest(w http.ResponseWriter, reason string, message string) {
+	response := HttpErrorResponse{HttpError{reason, message}}
+	responseBytes, _ := json.Marshal(response)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusBadRequest)
+	w.Write(responseBytes)
 }

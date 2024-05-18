@@ -44,7 +44,7 @@ curl -F "template=<test.tmpl" -F "data=<test-bad.json" http://localhost:10000/go
 ```sh
 rm -rf bin
 export GOTMPL_PKG=github.com/joshuagrisham-karolinska/gotmpl
-export GOTMPL_VERSION=v0.0.1-alpha.0
+export GOTMPL_VERSION=v0.0.1-alpha.1
 
 export GOOS=windows
 export GOARCH=amd64

@@ -6,22 +6,23 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"syscall/js"
 
 	"github.com/joshuagrisham-karolinska/gotmpl/template"
 )
 
-func Render(this js.Value, args []js.Value) interface{} {
+func Render(this js.Value, args []js.Value) (value any) {
 
 	result := make(map[string]interface{})
 
-	// TODO: In case text/template execution fails it will panic
-	// For now just return gracefully instead of letting the program terminate
-	// Better would be to potentially use some kind of reflection to get the actual error
-	// message from the panic and then return that error instead
+	// If text/template execution fails it will panic
+	// In this case we will capture the panic and return it as the "errorTmpl" value
 	defer func() {
+		result := make(map[string]interface{})
 		if err := recover(); err != nil {
-			return
+			result["errorTmpl"] = fmt.Sprintf("%v", err)
+			value = result
 		}
 	}()
 
