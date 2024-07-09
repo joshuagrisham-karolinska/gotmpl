@@ -13,10 +13,14 @@ CLI tool which renders a given `--template` using the given `--data` and writes 
 go build -o bin/ ./cmd/gotmpl
 ./bin/gotmpl
 ./bin/gotmpl -t test.tmpl -d test.json
+./bin/gotmpl -t test.tmpl -d test.xml
+./bin/gotmpl -t test.tmpl -d test.yaml
 
 # Run the CLI package without building
 go run cmd/gotmpl/main.go
 go run cmd/gotmpl/main.go -t test.tmpl -d test.json
+go run cmd/gotmpl/main.go -t test.tmpl -d test.xml
+go run cmd/gotmpl/main.go -t test.tmpl -d test.yaml
 
 # Test with invalid data
 go run cmd/gotmpl/main.go -t test.tmpl -d test-bad.json
@@ -34,6 +38,8 @@ go run cmd/gotmplserver/main.go
 
 # Post a template and data to the API
 curl -F "template=<test.tmpl" -F "data=<test.json" http://localhost:10000/gotmpl
+curl -F "template=<test.tmpl" -F "data=<test.xml" http://localhost:10000/gotmpl
+curl -F "template=<test.tmpl" -F "data=<test.yaml" http://localhost:10000/gotmpl
 
 # Post with invalid data
 curl -F "template=<test.tmpl" -F "data=<test-bad.json" http://localhost:10000/gotmpl
@@ -44,7 +50,7 @@ curl -F "template=<test.tmpl" -F "data=<test-bad.json" http://localhost:10000/go
 ```sh
 rm -rf bin
 export GOTMPL_PKG=github.com/joshuagrisham-karolinska/gotmpl
-export GOTMPL_VERSION=v0.0.1-alpha.1
+export GOTMPL_VERSION=v0.0.1-alpha.2
 
 export GOOS=windows
 export GOARCH=amd64
@@ -60,8 +66,8 @@ go build -o "bin/gotmplserver_${GOOS}_${GOARCH}" -ldflags "-X ${GOTMPL_PKG}.Vers
 ## Build and run a GUI using WebAssembly
 
 ```sh
-# Build the WebAssembly
-GOOS=js GOARCH=wasm go build -o wasm/template.wasm ./wasm/main.go
+# Build the WebAssembly (including the embedded tzdata database so it will work in the browser; see: https://pkg.go.dev/time/tzdata)
+GOOS=js GOARCH=wasm go build -tags timetzdata -o wasm/template.wasm ./wasm/main.go
 # Copy Go's standard wasm_exec.js
 cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" wasm/
 ```

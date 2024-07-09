@@ -6,10 +6,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
+	"github.com/clbanning/mxj/v2"
 	"github.com/docopt/docopt-go"
 	"github.com/joshuagrisham-karolinska/gotmpl"
 	"github.com/joshuagrisham-karolinska/gotmpl/template"
+	"sigs.k8s.io/yaml"
 )
 
 func main() {
@@ -64,12 +67,31 @@ func handlePath(w http.ResponseWriter, r *http.Request) {
 	//    - query parameters
 	//    - multipart/form-data
 	tmpl := r.FormValue("template")
-	dataString := r.FormValue("data")
+	dataString := strings.TrimSpace(r.FormValue("data"))
 
-	// Unmarshal data JSON string to a map[string]interface{}
-	// TODO: Support YAML in addition to JSON?
 	data := make(map[string]interface{})
-	err := json.Unmarshal([]byte(dataString), &data)
+	var err error
+
+	// TODO: Maybe better to support setting and reading Content-Type per part of multipart/form-data ?
+	// for now we will write some logic to try and "guess" JSON vs YAML vs XML by looking at the first character of the data
+
+	switch {
+
+	// unmarshall to map[string]interface requires an object at the top level even though valid JSON can start with an array or a single element value
+	// so here we will only try to detect if the data starts with "{" and assume it will be JSON
+	case dataString[:1] == "{":
+		err = json.Unmarshal([]byte(dataString), &data)
+
+	// beginning with "<" is assumed to be XML
+	case dataString[:1] == "<":
+		data, err = mxj.NewMapXml([]byte(dataString))
+
+	// otherwise we can just assume it is YAML, I guess ? (since in YAML you can quote key names and stuff..)
+	default:
+		err = yaml.Unmarshal([]byte(dataString), &data)
+
+	}
+
 	if err != nil {
 		writeHttpBadRequest(w, "DataUnmarshallingError", err.Error())
 		return

@@ -7,9 +7,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"syscall/js"
 
+	"github.com/clbanning/mxj/v2"
 	"github.com/joshuagrisham-karolinska/gotmpl/template"
+	"sigs.k8s.io/yaml"
 )
 
 func Render(this js.Value, args []js.Value) (value any) {
@@ -27,15 +30,34 @@ func Render(this js.Value, args []js.Value) (value any) {
 	}()
 
 	tmpl := args[0].String()
-	data := args[1].String()
+	data := strings.TrimSpace(args[1].String())
 
 	result["data"] = data
 	result["tmpl"] = tmpl
 
-	// Unmarshal data JSON string to a map[string]interface{}
-	// TODO: Support YAML in addition to JSON?
 	dataMap := make(map[string]interface{})
-	err := json.Unmarshal([]byte(data), &dataMap)
+	var err error
+
+	// TODO: Maybe better to add another argument for setting the format (JSON vs YAML vs XML)
+	// for now we will write some logic to try and "guess" JSON vs YAML vs XML by looking at the first character of the data
+
+	switch {
+
+	// unmarshall to map[string]interface requires an object at the top level even though valid JSON can start with an array or a single element value
+	// so here we will only try to detect if the data starts with "{" and assume it will be JSON
+	case data[:1] == "{":
+		err = json.Unmarshal([]byte(data), &dataMap)
+
+	// beginning with "<" is assumed to be XML
+	case data[:1] == "<":
+		dataMap, err = mxj.NewMapXml([]byte(data))
+
+	// otherwise we can just assume it is YAML, I guess ? (since in YAML you can quote key names and stuff..)
+	default:
+		err = yaml.Unmarshal([]byte(data), &dataMap)
+
+	}
+
 	result["dataMap"] = dataMap
 	if err != nil {
 		result["errorData"] = err.Error()

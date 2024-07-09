@@ -3,8 +3,6 @@ package template
 import (
 	"io"
 	"text/template"
-
-	"github.com/Masterminds/sprig/v3"
 )
 
 // Hard-coded "name" for the temporary Template instance that will be created
@@ -15,5 +13,5 @@ const templateName = "gotmpl"
 // - sprig v3 functions are available
 // - missing keys will result in an error
 func Render(tmpl string, data interface{}, w io.Writer) error {
-	return template.Must(template.New(templateName).Option("missingkey=error").Funcs(sprig.TxtFuncMap()).Parse(tmpl)).Execute(w, data)
+	return template.Must(template.New(templateName).Option("missingkey=error").Funcs(funcMap()).Parse(tmpl)).Execute(w, data)
 }

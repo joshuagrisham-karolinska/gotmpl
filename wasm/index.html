@@ -33,7 +33,7 @@
 				font-size: .85rem;
 				line-height: 1.5;
 				height: 100%;
-				resize: none;
+				/*resize: none;*/
 				white-space: pre;
 				width: 100%;
 			}
@@ -47,7 +47,7 @@
 				padding: 1rem;
 			}
 			.textarea-light {
-				background: rgb(55 57 83 / 0.1);
+				background: rgba(72, 73, 85, 0.637);
 				border-radius: 1rem;
 				border: 1px solid rgb(221 214 254 / 0.05);
 				padding: 1rem;
@@ -99,7 +99,10 @@
 						document.getElementById("error-data-img").style.display = "none";
 					}
 
-					document.getElementById("output").value = renderOutput.output;
+					if ('output' in renderOutput) {
+						document.getElementById("output").value = renderOutput.output;
+					}
+
 				}
 			};
 		</script>
@@ -126,32 +129,42 @@
 			</div>
 		</section>
 
-		<section id="main" style="display:flex;align-items:center;height:calc(calc(100vh - calc(calc(90px + 2rem) * 1)) - 2rem);min-height:calc(600px + 2rem);padding-bottom:1rem">
-			<div style="margin:0 auto;height:100%;width:calc(50% - .5rem);margin-right:1rem">
+		<section id="sectionData">
+			<div style="margin:0 auto;height:calc(50%);width:100%;">
 				<span style="height:1.4rem;display:flex;align-items:flex-start;padding:0 .5rem">
-					<h2 style="opacity:.75">TEMPLATE <span style="opacity:.5">in <a href="https://pkg.go.dev/text/template#hdr-Actions" target="_blank">Go</a> format</span></h2>
-					<h2 id="error-tmpl-txt" style="color:#FA5958;margin-left:auto"></h2>
-					<img id="error-tmpl-img" src="images/error.svg" style="display:none;margin-left:.25rem;width:1rem;height:1rem">
-				</span>
-				<div class="textarea" style="height:calc(50% - 1.9rem);margin-bottom:1rem"><textarea id="input-tmpl" style="height:100%" placeholder="Hello, {{.planet}}!" oninput="renderTemplate();">Hello, {{.planet}}!</textarea></div>
-				<span style="height:1.4rem;display:flex;align-items:flex-start;padding:0 .5rem">
-					<h2 style="opacity:.75;padding:0 .5rem">DATA <span style="opacity:.5">in <a href="https://www.json.org/json-en.html" target="_blank">JSON</a> format</span></h2>
+					<h2 style="opacity:.75;padding:0 .5rem">DATA <span style="opacity:.5">in <a href="https://www.json.org/json-en.html" target="_blank">JSON</a>, XML, or YAML format</span></h2>
 					<h2 id="error-data-txt" style="color:#FA5958;margin-left:auto"></h2>
 					<img id="error-data-img" src="images/error.svg" style="display:none;margin-left:.25rem;width:1rem;height:1rem">
 				</span>
-				<div class="textarea" style="height:calc(50% - 1.9rem)"><textarea id="input-data" style="height:100%" placeholder='{ "planet": "World" }' oninput="renderTemplate();">{ "planet": "World" }</textarea></div>
+				<div class="textarea"><textarea id="input-data" style="height:100%" placeholder='{ "planet": "World" }' oninput="renderTemplate();" rows="15">{ "planet": "World" }</textarea></div>
 			</div>
-			<div style="margin:0 auto;height:100%;width:calc(50% - .5rem)">
+		</section>
+
+		<section id="sectionTemplate">
+			<div style="margin:0 auto;height:calc(50%);width:100%;">
+				<span style="height:1.4rem;display:flex;align-items:flex-start;padding:0 .5rem">
+					<h2 style="opacity:.75">MAPPING TEMPLATE <span style="opacity:.5">in <a href="https://pkg.go.dev/text/template#hdr-Actions" target="_blank">Go</a> format</span></h2>
+					<h2 id="error-tmpl-txt" style="color:#FA5958;margin-left:auto"></h2>
+					<img id="error-tmpl-img" src="images/error.svg" style="display:none;margin-left:.25rem;width:1rem;height:1rem">
+				</span>
+				<div class="textarea"><textarea id="input-tmpl" style="height:100%" placeholder="Hello, {{.planet}}!" oninput="renderTemplate();" rows="15">Hello, {{.planet}}!</textarea></div>
+			</div>
+		</section>
+
+		<section id="sectionOutput">
+			<div style="margin:0 auto;height:calc(50%);width:100%;">
 				<span style="height:1.4rem;display:flex;align-items:flex-start;padding:0 .5rem">
 					<h2 style="opacity:.75">OUTPUT</h2>
 					<h2 style="opacity:.75;margin-left:auto">powered by</h2>
 					<a href="https://webassembly.org/" target="_blank"><img src="images/webassembly.svg" style="display:inline-block;margin-left:.25rem;width:1rem;height:1rem"></a>
 				</span>
-				<div class="textarea-light" style="height:calc(100% - 1.4rem)"><textarea id="output" placeholder="Rendered template will show up here..." disabled>Hello, World!</textarea></div>
+				<div class="textarea-light"><textarea id="output" placeholder="Rendered template will show up here..." disabled rows="15">Hello, World!</textarea></div>
 			</div>
 		</section>
+
 		<section id="footer" style="padding-top:0;font-size:.8rem">
 			<p style="text-align: center;opacity:.67">&nbsp;</p>
 		</section>
-</body>
+
+	</body>
 </html>
