@@ -72,14 +72,14 @@ func toLocalDateTime(str string, locationInOut ...string) string {
 	if len(locationInOut) > 0 && strings.TrimSpace(locationInOut[0]) != "" {
 		parsedtz, err := parseTzOffset(locationInOut[0])
 		if err != nil {
-			return ""
+			return err.Error()
 		}
 		intz = parsedtz
 	}
 	if len(locationInOut) > 1 && strings.TrimSpace(locationInOut[1]) != "" {
 		parsedtz, err := parseTzOffset(locationInOut[1])
 		if err != nil {
-			return ""
+			return err.Error()
 		}
 		outtz = parsedtz
 	}
